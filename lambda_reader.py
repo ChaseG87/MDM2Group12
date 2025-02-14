@@ -13,54 +13,44 @@ def check_parenthesis(sentence):
         raise ValueError('The sentence has incorrect parenthetic grammar.')
 
 
-def paren_index(sentence):
-    master = []
-    opens = []
-    closeds = []
-    for i in range(len(sentence)):
-        char = sentence[i]
+def parse_expression(sentence, index=0):
+    '''
+    Recursive parser
+    '''
+    result = []
+    current = ""
+
+    while index < len(sentence):
+        char = sentence[index]
         if char == '(':
-            master.append(i)
-            opens.append(i)
-        if char == ')':
-            master.append(i)
-            closeds.append(i)
-    return master, opens, closeds
-
-
-def depth_calc(master, opens, closeds):
-    depths = [0]
-    for idx in master:
-        if idx in opens:
-            depth +=1
-        if idx in closeds:
-            depth -= 1
-        depths.append(depth)
-    return depths
-
+            if current:
+                result.append(current)
+                current = ''
+            nested, index = parse_expression(sentence, index + 1) #Recursive step
+            result.append(nested)
+        elif char == ')':
+            if current:
+                result.append(current)
+            return result, index #stops sub operations
+        else:
+            current += char
+        index += 1
+    if current:
+        result.append(current)
+    return result, index
 
 def chop(sentence):
+    '''chops parentheses'''
     check_parenthesis(sentence)
-    master, opens, closeds = paren_index(sentence)
-    chopped = []
-    chopped.append([sentence[0:master[0]]])
-    for i in range(len(master)-1):
-        chopped.append([sentence[master[i]+1:master[i+1]]])
-    chopped.append([sentence[master[-1]+1:]])
-    chopped = [i for i in chopped if i != ['']]
-    depth_list = depth_calc(master, opens, closeds)
-    return chopped
+    parsed, x = parse_expression(sentence)
+    return parsed
 
-#want [['/x.x'], ['/x.xy'], [['/xy.xx', 'x.x']]]
+
 print(chop(sentence))
-       
+
 
 def preprocess(sentence):
-    for i in range(len(sentence)):
-        char = sentence[i]
-        if char == '/' or char == 'λ':
-            if sentence[i+2] != '.':
-                pass
+    pass
 
 
 class Function:
