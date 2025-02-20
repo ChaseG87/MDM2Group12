@@ -1,11 +1,24 @@
 import pandas as pd
 import numpy as np
 
-#lambda = \\
-df = pd.read_csv("hello.txt", sep=" ", header=None)
-#print(df[0][0])
-sentence = df[0][0]
 
+'''
+1. Parse sentence into chopped form
+2. identify functions and expressions as classes
+3. evaluate application of innermost objects on each other
+4. evaluation alpha conversion, then beta then neu reduction (maybe)
+5. repeat 3 and 4 till cannot be done anymore
+functions and subfunctions that go from string to object and back?
+
+[/x.xx, [/xy.yx]]
+recursive function application??
+'''
+filename = 'hello.txt'
+
+def pull_txt():
+    df = pd.read_csv(filename, sep=" ", header=None)
+    sentence = df[0][0] 
+    return sentence
 
 
 def check_parenthesis(sentence):
@@ -14,9 +27,7 @@ def check_parenthesis(sentence):
 
 
 def parse_expression(sentence, index=0):
-    '''
-    Recursive parser
-    '''
+    '''Recursive parser'''
     result = []
     current = ""
 
@@ -46,11 +57,45 @@ def chop(sentence):
     return parsed
 
 
-print(chop(sentence))
+#print(chop(sentence))
+
+def find_replacement(input, body):
+    options = 'abcdefghijklmnopqrstuvwxyz'
+    for option in options:
+        if option not in input and option not in body:
+            return option
 
 
-def preprocess(sentence):
-    pass
+def alpha_reduction(input, body):
+    '''Changes input into form that doesnt conflict with body.'''
+    for char in input:
+        if char in '/.()':
+            continue
+        else:
+            if char in body:
+                replacement = find_replacement(input, body)
+                for _ in range(input.count(char)):
+                    rep_idx = input.index(char)
+                    input = input[:rep_idx] + replacement + input[rep_idx+1:]
+    return input
+
+
+def preprocess1(sentence):
+    '''takes in a function and puts it in correct form eg. /x./y.xy -> /x.(/y.xy)'''
+    for idx in range(len(sentence)):
+        char = sentence[idx]
+        if char == '.':
+            if sentence[idx+1] == '/':
+                paren_count = 0
+                pos = idx+1
+                while paren_count >= 0 and pos <= len(sentence)-1:
+                    if sentence[pos] == '(':
+                        paren_count += 1
+                    if sentence[pos] == ')':
+                        paren_count -= 1
+                    pos += 1
+                sentence = sentence[0:idx+1] + '(' + sentence[idx+1:pos] + ')' + sentence[pos:]
+    return sentence
 
 
 class Function:
@@ -61,9 +106,42 @@ class Function:
         self.string = string
     def printit(self):
         print(self.string)
-    def beta_reduce(self, *inputs):
+    def beta_reduce(self, inputs):
+        '''inputs is a list of each individual input'''
         var_list = [self.vars[i] for i in range(len(self.vars))]
-        ins = [input[i].string() if input[i].type() == Function else input[i] for i in inputs]
+        ins = ['(' + input.string + ')' if type(input) == Function else input for input in inputs]
+        for idx in range(len(ins)):
+            var = var_list[idx]
+            innie = ins[idx]
+            self.vars = self.vars[1:]
+            innie = alpha_reduction(innie, self.body)
+            for _ in range(self.body.count(var)):
+                insert_idx = self.body.index(var)
+                self.body = self.body[0:insert_idx] + innie + self.body[insert_idx+1:]
+            
+
+class Var:
+    def __init__(self, name):
+        self.name = name
+        
+
+def main():
+    sentence = pull_txt()
+    sentence = preprocess1(sentence)
+    #chopped = chop(sentence)
+    print(sentence)
+
+        
+sent1 = Function('/xy.xxyy')
+sent2 = 'yy'
+sent3 = Function('/bc.c')
+sent1.beta_reduce([sent3])
+print(sent1.body, sent1.vars)
+sent1.beta_reduce([sent2])
+print(sent1.body, sent1.vars)
+print(preprocess1('/x./y.xxyy'))
+main()
+
 
 
         
