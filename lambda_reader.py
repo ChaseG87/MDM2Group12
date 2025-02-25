@@ -104,6 +104,15 @@ class Function:
         self.vars = string[1:period_idx]
         self.body = string[period_idx+1:]
         self.string = string
+
+    def __call__(self):
+        """
+        Runs a Diagnostics - Useful for Displaying.
+        """
+        print("String", self.string)
+        print("Body", self.body)
+        print("Vars", self.vars, "\n")
+        
     def printit(self):
         print(self.string)
     def beta_reduce(self, inputs):
@@ -135,10 +144,13 @@ def main():
 sent1 = Function('/xy.xxyy')
 sent2 = 'yy'
 sent3 = Function('/bc.c')
+
 sent1.beta_reduce([sent3])
-print(sent1.body, sent1.vars)
+sent1()
+
 sent1.beta_reduce([sent2])
-print(sent1.body, sent1.vars)
+sent1()
+
 print(preprocess1('/x./y.xxyy'))
 main()
 
