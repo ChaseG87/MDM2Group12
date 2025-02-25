@@ -104,14 +104,16 @@ class Function:
         self.vars = string[1:period_idx]
         self.body = string[period_idx+1:]
         self.string = string
+        self.alpha_input = "null"
 
     def __call__(self):
         """
         Runs a Diagnostics - Useful for Displaying.
         """
-        print("String", self.string)
-        print("Body", self.body)
-        print("Vars", self.vars, "\n")
+        print("String:", self.string)
+        print("Body:", self.body)
+        print("Alpha Input:", self.alpha_input)
+        print("Vars:", self.vars, "\n")
         
     def printit(self):
         print(self.string)
@@ -124,6 +126,7 @@ class Function:
             innie = ins[idx]
             self.vars = self.vars[1:]
             innie = alpha_reduction(innie, self.body)
+            self.alpha_input = innie
             for _ in range(self.body.count(var)):
                 insert_idx = self.body.index(var)
                 self.body = self.body[0:insert_idx] + innie + self.body[insert_idx+1:]
