@@ -11,7 +11,7 @@ functions and subfunctions that go from string to object and back?
 [/x.xx, [/xy.yx]]
 recursive function application??
 '''
-filename = 'hello.txt'
+filename = 'input.txt'
 
 
 def pull_txt():
@@ -135,7 +135,7 @@ class Function:
                 self.body = self.body[0:insert_idx] + innie + self.body[insert_idx+1:]
                 
 
-def read_multiple_functions(first_index = 0, second_index = 1, data = pull_txt(), reduce = False):
+def read_multiple_functions(first_index = 0, second_index = 1, data = pull_txt(), reduce = False, display = False):
     ## Creates a list for functions to be read from the file
     list_of_functions = []
 
@@ -149,15 +149,19 @@ def read_multiple_functions(first_index = 0, second_index = 1, data = pull_txt()
 
     ## Gets the first and second value - ONLY works for 2 values on each other, but would recommend using recursion for more complicated algorithms.
     first = list_of_functions[first_index]
-    second = list_of_functions[second_index]
 
-    ## Checks whether it is a function
-    if reduce:
-        if not(isinstance(first, str)) == True:
-            first.beta_reduce([second])
-
-    ## Runs Diagnostics on First 
-    first()
+    if second_index != None:
+        second = list_of_functions[second_index]
+    
+        ## Checks whether it is a function
+        if reduce:
+            if not(isinstance(first, str)) == True:
+                first.beta_reduce([second])
+    
+        if display:
+            ## Runs Diagnostics on First 
+            first()
+            
     return first
 
 
@@ -211,5 +215,10 @@ sent1()
 print(preprocess1('/x./y.xxyy'))
 main()
 
-test = read_multiple_functions(reduce = True)
-print(two_function_test('y','y'))
+for i in range(3):
+    test1 = read_multiple_functions(first_index = (3*i) + 0, second_index = (3*i) + 1, reduce = True, display = False)
+    test2 = read_multiple_functions(first_index = (3*i) + 2, second_index = None, reduce = False, display = False)
+    if two_function_test(test1, test2):
+        print("Test", str(i+1)+":", "TEST SUCCESSFUL")
+    else:
+        print("Test", str(i+1)+":", "TEST FAILURE")
