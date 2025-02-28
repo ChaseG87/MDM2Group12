@@ -13,6 +13,7 @@ recursive function application??
 '''
 filename = 'hello.txt'
 
+
 def pull_txt():
     '''
     Reads the text file line by line
@@ -24,9 +25,11 @@ def pull_txt():
         line_list.append(line.strip())
     return line_list
 
+
 def check_parenthesis(sentence):
     if sentence.count('(') != sentence.count(')'):
         raise ValueError('The sentence has incorrect parenthetic grammar.')
+
 
 def parse_expression(sentence, index=0):
     '''Recursive parser'''
@@ -52,6 +55,7 @@ def parse_expression(sentence, index=0):
         result.append(current)
     return result, index
 
+
 def chop(sentence):
     '''chops parentheses'''
     check_parenthesis(sentence)
@@ -66,6 +70,7 @@ def find_replacement(input, body):
         if option not in input and option not in body:
             return option
 
+
 def alpha_reduction(input, body):
     '''Changes input into form that doesnt conflict with body.'''
     for char in input:
@@ -78,6 +83,7 @@ def alpha_reduction(input, body):
                     rep_idx = input.index(char)
                     input = input[:rep_idx] + replacement + input[rep_idx+1:]
     return input
+
 
 def preprocess1(sentence):
     '''takes in a function and puts it in correct form eg. /x./y.xy -> /x.(/y.xy)'''
@@ -103,7 +109,7 @@ class Function:
         self.vars = string[1:period_idx]
         self.body = string[period_idx+1:]
         self.string = string
-        self.alpha_input = "null"
+        self.alpha_input = None
 
     def __call__(self):
         """
@@ -127,14 +133,9 @@ class Function:
             for _ in range(self.body.count(var)):
                 insert_idx = self.body.index(var)
                 self.body = self.body[0:insert_idx] + innie + self.body[insert_idx+1:]
+                
 
-def main():
-    sentence = pull_txt()
-    sentence = preprocess1(sentence)
-    #chopped = chop(sentence)
-    print(sentence)
-
-def read_multiple_functions(data = pull_txt(), first_index = 0, second_index = 1):
+def read_multiple_functions(first_index = 0, second_index = 1, data = pull_txt(), reduce = False):
     ## Creates a list for functions to be read from the file
     list_of_functions = []
 
@@ -151,11 +152,51 @@ def read_multiple_functions(data = pull_txt(), first_index = 0, second_index = 1
     second = list_of_functions[second_index]
 
     ## Checks whether it is a function
-    if not(isinstance(first, str)) == True:
-        first.beta_reduce([second])
+    if reduce:
+        if not(isinstance(first, str)) == True:
+            first.beta_reduce([second])
 
     ## Runs Diagnostics on First 
     first()
+    return first
+
+
+def two_function_test(function1, function2):
+    f1_is_function = (not(isinstance(function1, str)) == True)
+    f2_is_function = (not(isinstance(function2, str)) == True)
+
+    if f1_is_function and f2_is_function:
+        if function1.vars == function2.vars:
+            if function1.body == function2.body:
+                return True
+        else:
+            return False
+    
+    elif f1_is_function and not(f2_is_function):
+        if function1.body == function2:
+            return True
+        else:
+            return False
+    
+    elif not(f1_is_function) and f2_is_function:
+        if function1 == function2.body:
+            return True
+        else:
+            return False
+
+    else:
+        if function1 == function2:
+            return True
+        else:
+            return False 
+
+def main():
+    sentence = pull_txt()
+    sentence = preprocess1(sentence)
+    #chopped = chop(sentence)
+    print(sentence)
+    
+##################################################################
 
 sent1 = Function('/xy.xxyy')
 sent2 = 'yy'
@@ -169,3 +210,6 @@ sent1()
 
 print(preprocess1('/x./y.xxyy'))
 main()
+
+test = read_multiple_functions(reduce = True)
+print(two_function_test('y','y'))
