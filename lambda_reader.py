@@ -16,9 +16,19 @@ recursive function application??
 filename = 'hello.txt'
 
 def pull_txt():
-    df = pd.read_csv(filename, sep=" ", header=None)
-    sentence = df[0][0] 
-    return sentence
+    '''
+    Reads the text file line by line
+    '''
+    line_list = []
+
+    file = open(filename, "r")
+    for line in file:
+        line_list.append(line.strip())
+
+    ## Returns the whole list - temporarily disabled to work with the rest of the code
+    # return line_list
+    ## Modified version which reads only the first line, works with the rest of the code.
+    return line_list[0]
 
 
 def check_parenthesis(sentence):
@@ -157,7 +167,43 @@ sent1()
 print(preprocess1('/x./y.xxyy'))
 main()
 
+# '''
+# Code below attempts to read multiple lines of code from the File Directly using Python
+# In progress - Several BUGS as described below cause errors.
+# '''
+# ## Creates a list for functions to be read from the file
+# list_of_functions = []
 
+# ## Reads from the file and ensures that only things that have lambda in them become functions.
+# ## NEED TO DEAL WITH yy(/x.xy) as an input - this would break the code.
+# for value in data:
+#     if '/' in value:
+#         list_of_functions.append(Function(value))
+#     else:
+#         list_of_functions.append(value)
+
+# print(list_of_functions, "\n")
+
+# ## Test case.
+# # object = list_of_functions[0]
+# # object.beta_reduce([sent2])
+# # object()
+
+# ## Gets the first and second value - ONLY works for 2 values on each other, but would recommend using recursion for more complicated algorithms.
+# first = list_of_functions[0]
+# second = list_of_functions[1]
+
+# ## Prints out list of functions
+# print("List of functions:", list_of_functions)
+
+# ### BUG SOMEWHERE HERE - NEED TO FIX THIS
+# ## Checks whether it is a function
+# if not(isinstance(first, str)) == True:
+#     first.beta_reduce([sent2])
+#     print(first)
+
+# ## Runs Diagnostics on First 
+# first()
 
         
     
