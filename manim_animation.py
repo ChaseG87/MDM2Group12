@@ -5,10 +5,10 @@ from manim import *
 #manim -pql .\manim_animation.py BetaReduction
 
 
-class BetaReduction(Scene):
+class BetaReductionIdentity(Scene):
     def construct(self):
         # Title
-        title = Text("Beta Reduction", font_size=36)
+        title = Text("Identity Function", font_size=36)
         title.to_edge(UP)
         self.play(Write(title))
         self.wait()
@@ -20,7 +20,7 @@ class BetaReduction(Scene):
         
         # Set up the new expression: (λx.xx(λy.xy))(λa.a)g
         lambda_expr = MathTex(
-            r"(", r"\lambda x.", r"x \, x \,", r")", r"(", r"\lambda y.", r"y", r")"
+            r"(", r"\lambda x.", r"x \,", r")", r"y"
         )
         lambda_expr.move_to([col_x, start_y, 0])
         self.play(Write(lambda_expr))
@@ -35,8 +35,8 @@ class BetaReduction(Scene):
         
         # Create first intermediate notation
         intermediate1 = MathTex(
-            r"\lambda", r"[x := \lambda y.y]", r".", 
-            r"x \, x \, "
+            r"\lambda", r"[x := y]", r".", 
+            r"x \, "
         )
         intermediate1[1].set_color(RED)  # Highlight the substitution
         intermediate1.move_to([col_x, start_y - step_y_gap, 0])
@@ -59,8 +59,7 @@ class BetaReduction(Scene):
         
         # First step result
         step1 = MathTex(
-            r"(", r"\lambda y.", r"y", r") \,",
-            r"(", r"\lambda y.", r"y", r") \,"
+            r"y"
         )
         step1.move_to([col_x, start_y - 2*step_y_gap, 0])
         
