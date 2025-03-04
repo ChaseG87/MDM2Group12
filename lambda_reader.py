@@ -1,5 +1,3 @@
-import pandas as pd
-
 '''
 1. Parse sentence into chopped form
 2. identify functions and expressions as classes
@@ -16,7 +14,7 @@ filename = 'input.txt'
 
 def pull_txt():
     '''
-    Reads the text file line by line
+    Reads the text file and returns a list which has the contents of one line as an entry.
     '''
     line_list = []
 
@@ -27,12 +25,15 @@ def pull_txt():
 
 
 def check_parenthesis(sentence):
+    """ Checks the parentheses in a sentance to make sure that the amount of ( and ) are equal. """
     if sentence.count('(') != sentence.count(')'):
         raise ValueError('The sentence has incorrect parenthetic grammar.')
 
 
 def parse_expression(sentence, index=0):
-    '''Recursive parser'''
+    '''
+    Parses expressions recursively by --------- 
+    '''
     result = []
     current = ""
 
@@ -57,7 +58,7 @@ def parse_expression(sentence, index=0):
 
 
 def chop(sentence):
-    '''chops parentheses'''
+    ''' Chops sentance by passing parse_expression() '''
     check_parenthesis(sentence)
     parsed, x = parse_expression(sentence)
     return parsed
@@ -65,6 +66,10 @@ def chop(sentence):
 #print(chop(sentence))
 
 def find_replacement(input, body):
+    '''
+    Used in alpha conversion.
+    Finds a substitute variable for a sentance in the case that one is occupied.
+    '''
     options = 'abcdefghijklmnopqrstuvwxyz'
     for option in options:
         if option not in input and option not in body:
@@ -72,7 +77,7 @@ def find_replacement(input, body):
 
 
 def alpha_reduction(input, body):
-    '''Changes input into form that doesnt conflict with body.'''
+    ''' Changes input into form that doesnt conflict with body. '''
     for char in input:
         if char in '/.()':
             continue
@@ -86,7 +91,7 @@ def alpha_reduction(input, body):
 
 
 def preprocess1(sentence):
-    '''takes in a function and puts it in correct form eg. /x./y.xy -> /x.(/y.xy)'''
+    ''' Takes in a function and puts it in correct form eg. /x./y.xy -> /x.(/y.xy) '''
     for idx in range(len(sentence)):
         char = sentence[idx]
         if char == '.':
@@ -112,16 +117,17 @@ class Function:
         self.alpha_input = None
 
     def __call__(self):
-        """
-        Runs a Diagnostics - Useful for Displaying.
-        """
+        """ Runs a Diagnostics - Useful for Displaying. """
         print("\n\n","String:", self.string)
         print("Body:", self.body)
         print("Alpha Input:", self.alpha_input)
         print("Vars:", self.vars, "\n\n")
         
     def beta_reduce(self, inputs):
-        '''inputs is a list of each individual input'''
+        '''
+        Beta reduces the display using inputs.
+        Uses notation (class)(inputs).
+        '''
         var_list = [self.vars[i] for i in range(len(self.vars))]
         ins = ['(' + input.string + ')' if type(input) == Function else input for input in inputs]
         for idx in range(len(ins)):
@@ -136,6 +142,13 @@ class Function:
                 
 
 def read_multiple_functions(first_index = 0, second_index = 1, data = pull_txt(), reduce = False, display = False):
+    '''
+    Checks multiple lines of the file and then reduces them.
+    Arguments:
+    reduce - Can choose to reduce the function if true - first reduces second.
+    display - can display the diagnostics for the first variable if on.
+    '''
+    
     ## Creates a list for functions to be read from the file
     list_of_functions = []
 
@@ -166,6 +179,11 @@ def read_multiple_functions(first_index = 0, second_index = 1, data = pull_txt()
 
 
 def two_function_test(function1, function2):
+    '''
+    Compares whether two functions are the same.
+    Works for both functions and arguments.
+    '''
+    
     f1_is_function = (not(isinstance(function1, str)) == True)
     f2_is_function = (not(isinstance(function2, str)) == True)
 
@@ -194,7 +212,32 @@ def two_function_test(function1, function2):
         else:
             return False 
 
+
+def test_cases(no_of_cases, display = True):
+    '''
+    Applys the test cases and prints out whether it is successful.
+    No_of_cases = No of cases to be applyed starting at the first.
+    display (optional) - chooses whether to display the outcomes of the tests. Default = True.
+    '''
+    
+    if display:
+        print("\n" + "TEST CASES")
+        print("----------")
+    
+    for i in range(no_of_cases):
+        test1 = read_multiple_functions(first_index = (3*i) + 0, second_index = (3*i) + 1, reduce = True, display = False)
+        test2 = read_multiple_functions(first_index = (3*i) + 2, second_index = None, reduce = False, display = False)
+        if two_function_test(test1, test2):
+            print("Test", str(i+1)+":", "TEST SUCCESSFUL")
+        else:
+            print("Test", str(i+1)+":", "TEST FAILURE")
+
+
 def main():
+    '''
+    Main function.
+    Takes a sentence, preprocesses it and turns it into a list, where the lists represent brackets.
+    '''
     sentence = pull_txt()
     sentence = preprocess1(sentence)
     #chopped = chop(sentence)
@@ -215,10 +258,4 @@ sent1()
 print(preprocess1('/x./y.xxyy'))
 main()
 
-for i in range(3):
-    test1 = read_multiple_functions(first_index = (3*i) + 0, second_index = (3*i) + 1, reduce = True, display = False)
-    test2 = read_multiple_functions(first_index = (3*i) + 2, second_index = None, reduce = False, display = False)
-    if two_function_test(test1, test2):
-        print("Test", str(i+1)+":", "TEST SUCCESSFUL")
-    else:
-        print("Test", str(i+1)+":", "TEST FAILURE")
+test_cases(3)
