@@ -321,8 +321,128 @@ def main():
 if __name__ == "__main__":
     main() 
 
+
+def fileread(input, filename = 'definitions.csv', display = False):
+    df = pd.read_csv(filename, header = None, names = ['Symbol', 'Expression'])
+
+    if display:
+        print(symbol)
+    
+
+    symbol = df['Symbol']
+    expression = df['Expression']
+
+    while True:
+        present = False
+        for character in input:
+            for idx, val in enumerate(symbol):
+                if val == character:
+                    input = input.replace(character, "("+str(expression[idx])+")")
+                    present = True
+
+            if display:
+                print("Character:",character)
+                print("Input:",input)
+                print("Present:", present)
+
+        if present == False:
+            return input
+
+
+def compare_two_cases(sentence1, sentence2, display = False):
+    sentence1 = full_lambda_evaluator(fileread(sentence1))
+    sentence2 = full_lambda_evaluator(fileread(sentence2))
+
+    print("Sentence1:", sentence1)
+    print("Sentence2:", sentence2)
+    for idx, char in enumerate(sentence1):
+
+        if sentence2[idx] == char:
+            continue
+        else:
+            sentence2 = sentence2.replace(sentence2[idx], char)
+
+            if display:
+                print("Char", char)
+
+    if sentence1 == sentence2:
+        return True
+    
+    else:
+        return False
+        
+
+def test_case(filename = 'TestCases.csv', display = False, specific_case = None):
+    df = pd.read_csv(filename, header = None, names = ['Question', 'Answer'])
+    print(df)
+    question = df['Question']
+    answer = df['Answer']
+
+    if display:
+        print("Question:", question)
+        print("Answer:", answer)
+    
+    if specific_case == None:
+        for idx, val in enumerate(question):
+            test = compare_two_cases(val, answer[idx])
+            
+            if test:
+                print("Test " + str(idx) + ":", "SUCCESS")
+
+            else:
+                print("Test " + str(idx) + ":", "FAIL")
+
+    else:
+        test = compare_two_cases(question[specific_case], answer[specific_case])                  
+        if test:
+            print("Test " + str(specific_case) + ":", "SUCCESS")
+
+        else:
+            print("Test " + str(specific_case) + ":", "FAIL")
+
+def replace_with_shorthand(input, filename = 'Definitions.csv'):
+    df = pd.read_csv(filename, header = None, names = ['Symbol', 'Expression'])  
+    expression = df['Expression']
+
+    while True:
+        prior_version = input
+        temporary_version = input
+
+        for idx, char in enumerate(temporary_version):
+            if char == "(":
+                left_bracket_index = idx
+                print("Left Bracket Index:", left_bracket_index)
+
+        for idx, char in enumerate(reversed(temporary_version)):
+            if char == ")":
+                right_bracket_index = idx
+                print("Right Bracket Index:", right_bracket_index)
+        
+        try:
+            temporary_version = temporary_version[:left_bracket_index] + temporary_version[(left_bracket_index + 1):right_bracket_index] + temporary_version[(right_bracket_index + 1):]
+            selected_area = input[(left_bracket_index + 1) : right_bracket_index]
+
+        except UnboundLocalError:
+            selected_area = input
+
+        for val in expression:
+            if compare_two_cases(selected_area, val) == True:
+                input = input.replace(selected_area, val)
+
+        later_version = input
+
+        if prior_version == later_version:
+            return input
+
+
 ########################################################
 
 
+# string_to_evaluate = fileread('/x.xFT')
+# print(string_to_evaluate)
+# print(type(string_to_evaluate))
+# full_lambda_evaluator(string_to_evaluate, give_steps = True)
 
+# test_case()
+# test_case(specific_case = 13)
 
