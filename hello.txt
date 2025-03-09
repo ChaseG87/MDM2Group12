@@ -1,2 +1,2 @@
-A((B(F))(C))D
+(/nfx.f(nfx))(/fx.f(x))
 
