@@ -197,7 +197,7 @@ def preprocess_church(sentence):
     return sentence
 
 
-def lambda_simplify(lst, nested=False, body=False):  
+def lambda_simplify(lst, body=False):  
     lst = preprocess_church(lst)
     chopped = single_chop(lst)
     chopped = [function_reduce(j) if isinstance(j, list) else j for j in chopped]
@@ -232,8 +232,12 @@ def depth_test(lst, lamb):
         idx += 1
     return paren_depth
 
-
-def find_next_action(lst):
+    
+def find_next_action(lst, step):
+    '''
+    Takes an input of a lambda calculus sentence in list mode, finds all options for the next reduction,
+    then picks 
+    '''
     lst = preprocess_church(lst)
     options = []
     lambda_idx = [i for i in range(len(lst)) if lst[i] == '/']
@@ -259,28 +263,36 @@ def find_next_action(lst):
             except:
                 break
             sidx += 1
-    if options:
-        options_sorted = sorted(options, key=lambda x: - x[1] - x[2]*0.001)
+    if options and step%100 > 2:
+        options_sorted = sorted(options, key=lambda x:  x[1] -x[2]*0.001)
+        return options_sorted[-1][0]
+    elif options and step%100 <= 2:
+        options_sorted = sorted(options, key=lambda x: -x[1]*0.001)
         return options_sorted[-1][0]
     else:
         return remove_double_parenthesis(lst)
 
 
 def full_lambda_evaluator(string, give_steps=False):
-    loop_checker = [[]]
+    '''
+    Inputs a string of lambda calculus with '/' as lambda.
+    Returns a string reduced but equivalent to the input.
+    '''
+    n = 1
+    loop_checker = [[]] # keeps track of updates to look for repetitions
     current = string_to_list(string)
-    if give_steps:
-        print('Initial:', string)
-    new = find_next_action(current)
+    if give_steps: 
+        print('Initial:', string) # print initial value if in give_steps mode
+    new = find_next_action(current, step=n)
     loop_checker.append(new)
     if give_steps:
-        print('Step 1:', list_to_string(new))
+        print('Step 1:', list_to_string(new)) # gives each step of the evaluator if in give_steps mode
     n = 2
-    while current != new:
+    while current != new: # while loop makes sure there are no more next steps from 'find_next_action'
         current = new
-        new = find_next_action(current)
+        new = find_next_action(current, step=n)
         loop_checker.append(new)
-        if loop_checker[-1] == loop_checker[-3]:
+        if loop_checker[-1] == loop_checker[-3]: # checks if function will 1st form loop
             print('Sentence loops!')
             if give_steps:
                 print('Reduced Form:', list_to_string(loop_checker[-1]))
@@ -288,15 +300,19 @@ def full_lambda_evaluator(string, give_steps=False):
         if give_steps:
             print(f'Step {n}:', list_to_string(new))
         n += 1
-        if n >= 100:
+        if n >= 1000: # stops process after 100 steps to stop 'sneaky' loops
             print('Max recursion depth reached')
             break
-    if give_steps:
+    if give_steps: # returns final result if in give_steps mode
                 print('Reduced Form:', list_to_string(remove_double_parenthesis(current)))
     return list_to_string(remove_double_parenthesis(current))
 
 
 def main():
+    '''
+    Runs the main process of lambda_reader2.py. Evaluates text in hello.txt
+    using full_lambda_evaluator in give_steps mode.
+    '''
     text = pull_txt()
     return full_lambda_evaluator(text, give_steps=True)
     
@@ -307,10 +323,6 @@ if __name__ == "__main__":
 
 ########################################################
 
-#(/nfx.f(nfx))(/fx.x)
-#(/mnfx.m(mf(nfx)))(/fx.f(f(fx)))(/fx.f(f(f(fx))))
-
-#full_lambda_evaluator('(/xy.xx)(/z.z)a', give_steps=True)
 
 
 
