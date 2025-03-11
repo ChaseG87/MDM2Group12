@@ -43,9 +43,9 @@ class Function:
                     continue
                 elif char in vars:
                     replacement = find_replacement(input, vars)
-                    for _ in range(input.count(char)):
+                    for _ in range(input.count(char)): #updates variable with replacement for each instance
                         rep_idx = input.index(char)
-                        input = input[:rep_idx] + [replacement] + input[rep_idx+1:]
+                        input = input[:rep_idx] + [replacement] + input[rep_idx+1:] 
             return input
             
 
@@ -65,22 +65,26 @@ class Function:
         self.update()
 
 def pull_txt():
+    '''Pulls text from predetermined file'''
     df = pd.read_csv(filename, sep=" ", header=None)
     sentence = df[0][0] 
     return sentence
 
 
 def check_parenthesis(sentence):
+    '''Checks if parenthetic grammar is correct'''
     if sentence.count('(') != sentence.count(')'):
         raise ValueError('The sentence has incorrect parenthetic grammar.')
     
 
 def string_to_list(string):
+    '''Turns a string lambda expression to a list'''
     result = [i for i in string]
     return result
 
 
 def list_to_string(lst):
+    '''Turns list lambda expression to a string'''
     string = ''
     for i in lst:
             string += str(i)
@@ -116,7 +120,7 @@ def function_reduce(lst):
 
 
 def single_chop(lst):
-    '''single chop of parentheses'''
+    '''single chop of parentheses with a list input using a stack'''
     stack = []
     current = []
     depth = 0
@@ -144,15 +148,16 @@ def single_chop(lst):
 
 
 def remove_double_parenthesis(lst):
+    '''Removes double parentheses in a lambda calculus expression given a list form'''
     depth = 0
     idx = 0
     active_search, search_depth = False, depth
     while idx < len(lst):
-        if depth == 0:
+        if depth == 0: #Stops search if outside of scope
             active_search = False
         if lst[idx] == '(':
             depth += 1
-            if lst[idx-1] == '(':
+            if lst[idx-1] == '(': #Turns on search for same depth double parentheses
                 active_search, search_depth = True, depth
                 start_idx = idx-1
         if lst[idx] == ')':
@@ -165,6 +170,7 @@ def remove_double_parenthesis(lst):
 
 
 def function_flattener(lst):
+    '''Recursive flattener of lists and function objects'''
     master = []
     for l in lst:
         if isinstance(l, Function):
@@ -199,9 +205,9 @@ def preprocess_church(sentence):
 
 def lambda_simplify(lst, body=False):  
     lst = preprocess_church(lst)
-    chopped = single_chop(lst)
+    chopped = single_chop(lst) #breaks into largest reducible functions
     chopped = [function_reduce(j) if isinstance(j, list) else j for j in chopped]
-    for i in range(len(chopped)):
+    for i in range(len(chopped)): #does all possible beta reduction operations
         if i+1 < len(chopped):
             if isinstance(chopped[i][0], Function):
                 if len(chopped[i][0].vars) and len(chopped) > i+1:
@@ -214,8 +220,9 @@ def lambda_simplify(lst, body=False):
                         chopped[i][1].beta_reduce([chopped[i+1]])
                         chopped.pop(i+1)
                         break
-    lst = function_flattener(chopped)
-    if len(chopped) == 1 and chopped[0][0] == '(' and chopped[0][-1] == ')' and not body:
+    lst = function_flattener(chopped) 
+    if len(chopped) == 1 and chopped[0][0] == '(' and chopped[0][-1] == ')' and not body: 
+        #takes away outermost parentheses if redundant
         lst = lst[1:-1]
     return lst
 
@@ -238,14 +245,14 @@ def find_next_action(lst, step):
     Takes an input of a lambda calculus sentence in list mode, finds all options for the next reduction,
     then picks 
     '''
-    lst = preprocess_church(lst)
+    lst = preprocess_church(lst) #normaizes form of lambda expressions
     options = []
     lambda_idx = [i for i in range(len(lst)) if lst[i] == '/']
     if not lambda_idx:
         return lst
     if (lambda_idx[0] == 0 or lambda_idx[0] == 1) and lst != lambda_simplify(lst):
         options.append([lambda_simplify(lst), depth_test(lst, lambda_idx[0]), lambda_idx[0]])
-    for lamb in lambda_idx:
+    for lamb in lambda_idx: #goes through lambdas and checks if beta reduction is possible then adds that possibility
         sidx = lamb+1
         paren_count = 0
         while sidx <= len(lst):
@@ -263,11 +270,11 @@ def find_next_action(lst, step):
             except:
                 break
             sidx += 1
-    if options and step%100 > 2:
+    if options and step%100 > 2: #sorts possibilites bredth first
         options_sorted = sorted(options, key=lambda x:  x[1] -x[2]*0.001)
         return options_sorted[-1][0]
-    elif options and step%100 <= 2:
-        options_sorted = sorted(options, key=lambda x: -x[1]*0.001)
+    elif options and step%100 <= 2: #sort possible updates  depth first
+        options_sorted = sorted(options, key=lambda x: -x[1])
         return options_sorted[-1][0]
     else:
         return remove_double_parenthesis(lst)
