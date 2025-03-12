@@ -28,6 +28,7 @@
 * _successor1.py_ produces an animation of the beta reduction steps showing the successor of 0 is 1.
 
 ###### To run _manim_animation.py_ or _successor1.py_, manim, a latex interpreter, and a video processor like ffmpeg must be installed.
+###### To run _lambda_reader2.py_ pandas must be installed.
 
 --------------------------------------------------------------------------------------------------------------------------------
 
