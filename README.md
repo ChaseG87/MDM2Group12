@@ -27,6 +27,12 @@
 
 * _successor1.py_ produces an animation of the beta reduction steps showing the successor of 0 is 1.
 
+* _NAND\_vid.mp4_ is a video of a NAND gate being represented in pure lambda calculus.
+
+* _identity\_vid.mp4_ is a video of the identity function $\lambda x.x$ being applied to $y$.
+
+* _successor\_vid.mp4_ is a video of the successor function, $\lambda nfx.f(nfx)$, beiong applied to 0.
+
 ###### To run _manim_animation.py_ or _successor1.py_, manim, a latex interpreter, and a video processor like ffmpeg must be installed.
 ###### To run _lambda_reader2.py_ pandas must be installed.
 
