@@ -3,10 +3,21 @@
 
 ### It contains 2 working stages of the lambda calculus evaluator: lambda_reader.py and lambda_reader2.py.
 
-* **lambda_reader.py** is an outdated version that parses through strings directly and is limited in its computational ability.
+##### * _lambda_reader.py_ is an outdated version that parses through strings directly and is limited in its computational ability.
 
-* **lambda_reader2.py** is the most updated version that parses through lists of strings and functional objects.
+##### * _lambda_reader2.py_ is the most updated version that parses through lists of strings and functional objects.
 
+--------------------------------------------------------------------------------------------------------------------------------
 
-### To see the lambda_reader2.py in action simply call the program to run and it will show and example multiplication of 4 times 4.
+#### To see the lambda_reader2.py in action simply call the program to run and it will show and example multiplication of 4 times 4.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+## Other File Descriptions:
+
+* _Definitions.csv_ defines symbols of commonly used functions in lambda calculus.
+
+* _TestCases.csv_ is a list of test cases that can be applied via the **test_case()** function in **lambda_reader2.py**.
+
+* 
 
