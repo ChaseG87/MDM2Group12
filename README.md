@@ -33,6 +33,8 @@
 
 * _successor\_vid.mp4_ is a video of the successor function, $\lambda nfx.f(nfx)$, beiong applied to 0.
 
+* _Y\_Combinator\_vid.mp4_ is a video of the Y combinator function, $\lambda y.(\lambda x.y(xx))(\lambda x.y(xx))$, being applied.
+
 ###### To run _manim_animation.py_ or _successor1.py_, manim, a latex interpreter, and a video processor like ffmpeg must be installed.
 ###### To run _lambda_reader2.py_ pandas must be installed.
 
