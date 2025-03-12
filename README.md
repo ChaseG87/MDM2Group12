@@ -29,6 +29,6 @@
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-###### Important Note: $\lambda$ is represented as a forward-slash string '/'.
+# <span style="color: red"> Important Note: $\lambda$ is represented as a forward-slash string '/'. </span>
 
 
