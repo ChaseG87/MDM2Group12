@@ -3,9 +3,9 @@
 
 ### It contains 2 versions of the lambda calculus evaluator: lambda_reader.py and lambda_reader2.py.
 
-##### * _lambda_reader.py_ is an outdated version that parses through strings directly and is limited in its computational ability.
+* ##### _lambda_reader.py_ is an outdated version that parses through strings directly and is limited in its computational ability.
 
-##### * _lambda_reader2.py_ is the most updated version that parses through lists of strings and functional objects.
+* ##### _lambda_reader2.py_ is the most updated version that parses through lists of strings and functional objects.
 
 --------------------------------------------------------------------------------------------------------------------------------
 
