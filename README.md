@@ -1,4 +1,4 @@
-###### This is the working repository of MDM2's Second Term Group 12.
+# This is the working repository of MDM2's Second Term Group 12.
 
 
 ### It contains 2 working stages of the lambda calculus evaluator: lambda_reader.py and lambda_reader2.py.
