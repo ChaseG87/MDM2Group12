@@ -5,17 +5,31 @@ Object based lambda calculus evaluator that can evaluate normal form
 or inner application first depending on sorting method in lambda simplify.
 '''
 
+## Sets the default filename for the input
 filename = 'hello.txt'
 
 
 class Function:
     def __init__(self, lst):
+        """Seperates the parts of the equation """
+         ## Gets the index of the .
         period_idx = lst.index('.')
+
+        ## Uses the index of the . to seperate the remaining sections.
         self.vars = lst[1:period_idx]
         self.body = lst[period_idx+1:]
         self.lst = lst
 
+        def __call__(self):
+        """ Runs a Diagnostics - Useful for Displaying. """
+
+        print("\n\n","String:", self.lst)
+        print("Body:", self.body)
+        print("Vars:", self.vars, "\n\n")
+        
     def update(self):
+        """ Regularly updates the list with the vars and body to make sure they are consistent. """
+        
         if len(self.vars) > 0:
             self.lst = ['/'] + self.vars + ['.'] + self.body
         else:
@@ -24,67 +38,91 @@ class Function:
 
 
     def beta_reduce(self, inputs):
-        '''inputs is a list of each individual input'''
+        '''
+        Beta reduces the function to create a simpler module. Necessary for the inputs.
+        
+        Input Parameters:
+        inputs - List of inputs to beta reduce by. Note that A.beta_reduce(B) means #######################
+        '''
 
 
         def alpha_reduction(input, vars):
-            '''Changes input into form that doesnt conflict with body.'''
+           '''
+            Changes input into form that doesnt conflict with body. Necessary for beta reduction.
+
+            Input Parameters:
+            input - The input sentence being searched for substitution.
+            vars - The variables already present in the sentence. 
+
+            Output:
+            input - The alpha substituted sentence.
+            '''
 
 
             def find_replacement(input, vars):
+                """Finds a replacement variable. Used for alpha reduction."""
                 options = 'abcdefghijklmnopqrstuvwxyz'
                 for option in options:
                     if option not in input and option not in vars:
                         return option
                     
-
+            ## Searches through all characters in input and locates non-special characters
             for char in input:
                 if char in ['/', '.', '(', ')']:
                     continue
+
+                ## If the character is in variables, find a replacement.
                 elif char in vars:
                     replacement = find_replacement(input, vars)
-                    for _ in range(input.count(char)): #updates variable with replacement for each instance
+
+                    # Updates variable with replacement for each instance
+                    for _ in range(input.count(char)):
                         rep_idx = input.index(char)
                         input = input[:rep_idx] + [replacement] + input[rep_idx+1:] 
+                        
             return input
             
-
+         ## Creates a seperate variable for the variable list, locates the inside and flattens the body. (RHS of . in lambda expression)
         var_list = self.vars
         ins = [function_flattener(input) for input in inputs]
         self.body = function_flattener(self.body)
+
+        ## Iterates through the variables and flattened indexes and alpha reduces them.
         for idx in range(min(len(var_list), len(ins))):
             var = var_list[idx]
             innie = ins[idx]
             self.vars = self.vars[1:]
             innie = alpha_reduction(innie, var_list)
 
+        ## Substitutes the inside of the equations back into the bodies ##############################
             for _ in range(self.body.count(var)):
                 insert_idx = self.body.index(var)
                 self.body = self.body[0:insert_idx] + innie + self.body[insert_idx+1:]
 
+        ## Updates the self.lst
         self.update()
 
 def pull_txt():
-    '''Pulls text from predetermined file'''
+    ''' Pulls text from predetermined file '''
     df = pd.read_csv(filename, sep=" ", header=None)
     sentence = df[0][0] 
     return sentence
 
 
 def check_parenthesis(sentence):
-    '''Checks if parenthetic grammar is correct'''
+    ''' Checks if parenthetic grammar is correct '''
     if sentence.count('(') != sentence.count(')'):
         raise ValueError('The sentence has incorrect parenthetic grammar.')
     
 
 def string_to_list(string):
-    '''Turns a string lambda expression to a list'''
+    ''' Turns a string lambda expression to a list '''
     result = [i for i in string]
     return result
 
 
 def list_to_string(lst):
-    '''Turns list lambda expression to a string'''
+    ''' Turns list lambda expression to a string '''
     string = ''
     for i in lst:
             string += str(i)
@@ -92,14 +130,33 @@ def list_to_string(lst):
 
 
 def function_reduce(lst):
-    '''turns innermost function into Function class then nests all to functional form'''
+    ''' 
+    Turns innermost function into Function class then nests all to functional form
+
+    Input parameters:
+    lst - The input function to analyse.
+
+    Output:
+    lst (for arguments without /) - The original list, unchanged
+    updated (for arguments with /) - The innermost function within the original list.
+    '''
+
+    ## Collects the index of the lambdas.
     lambda_idx = [i for i in range(len(lst)) if lst[i] == '/']
+
+    ## While there are more than one lambda left in the expression
     while lst.count('/'):
+        ## Isolates the first lambda
         lamb = lambda_idx[0]
         lambda_idx.pop(0)
+
+        ## Sets default values, with parenthesis count = 0
         paren_count = 0
         idx = lamb+1
         no_inner = True
+
+        ## Parenthesis depth calculation.
+        ## Detects the balance of ( to ), and inners using /. If more ) than (, it breaks the loop.
         while paren_count >= 0 and idx < len(lst):
             if lst[idx] == '/':
                 no_inner = False
@@ -108,37 +165,63 @@ def function_reduce(lst):
             if lst[idx] == '(':
                 paren_count += 1
             idx += 1
+
+        ## Creates a new list and reduces it. Only if count of "(" < count of ")"
         if no_inner and paren_count < 0:
             new_list = lst[0:lamb] + [Function(lst[lamb:idx-1])] + lst[idx-1:]
             updated = function_reduce(new_list)
             return updated
+
+       ## Creates a new list and reduces it. Only if count of "(" >= count of ")"
         elif no_inner and paren_count >= 0:
             new_list = lst[0:lamb] + [Function(lst[lamb:idx])] + lst[idx:]
             updated = function_reduce(new_list)
             return updated
+            
     return lst
 
 
 def single_chop(lst):
-    '''single chop of parentheses with a list input using a stack'''
+    '''
+    Performs a single chop of parentheses with a list input using a stack.
+
+    Input Parameters:
+    lst - The list input being analysed.
+
+    Output:
+    stack - The chopped stack.
+    '''
+
+    ## Inputs the current stack and sets a default value for depth
     stack = []
     current = []
     depth = 0
+
+    ## Creates the depth for the various list.
+    ## Iterates through each item in the list; if it reaches a '(' then depth increases by 1.
     for i in lst:
         if i == '(':
             depth += 1
+
+            ## Appends to current if it has a bracket depth of only 1
             if depth == 1:
                 current = []
                 current.append(i)
             else:
                 current.append(i)
+
+        ## Reduces depth by 1 if encounters ')'.
         elif i == ')':
             depth -= 1
+
+            ## Appends to current if it has a bracket depth of 0.
             if depth == 0:
                 current.append(i)
                 stack.append(current)
             else:
                 current.append(i)
+
+        ## Appends i to a list if its a character thats not a bracket; stack if depth = 0, current if depth is not 0.        
         else:
             if depth == 0:
                 stack.append(i)
@@ -146,26 +229,43 @@ def single_chop(lst):
                 current.append(i)
     return stack
 
-
+#####################################################COMPLETE THIS
 def remove_double_parenthesis(lst):
-    '''Removes double parentheses in a lambda calculus expression given a list form'''
+    '''
+    Removes double parentheses in a lambda calculus expression given a list form.
+    
+    Input Parameters:
+    lst - The list of characters in the lambda calculus expression ##############################
+    '''
+    
+    ## Setting default values for the depth and index
     depth = 0
     idx = 0
     active_search, search_depth = False, depth
     while idx < len(lst):
-        if depth == 0: #Stops search if outside of scope
+
+        # Stops search if outside of scope
+        if depth == 0: 
             active_search = False
+            
         if lst[idx] == '(':
             depth += 1
-            if lst[idx-1] == '(': #Turns on search for same depth double parentheses
+
+            #Turns on search for same depth double parentheses
+            if lst[idx-1] == '(':
                 active_search, search_depth = True, depth
                 start_idx = idx-1
+
+        ## Removes double parenthesis if detects an increase in the depth by 2 (double brackets), performs the function recursively
         if lst[idx] == ')':
             depth -= 1
+            
             if lst[idx-1] == ')' and active_search and search_depth == depth + 2:
                 lst = lst[0:start_idx] + lst[start_idx+1:idx] + lst[idx+1:]
                 return remove_double_parenthesis(lst)
         idx += 1
+
+    ## Returns the reduced outcome
     return lst
 
 
