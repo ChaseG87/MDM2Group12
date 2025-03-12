@@ -21,5 +21,14 @@
 
 * _hello.txt_ is the file called to be read by default when **lambda_reader2.py** is called.
 
-* _input.txt_ 
+* _input.txt_ is an old test case input for **lambda_reader.py**.
+
+* _manim_animation.py_ produces a simple beta reduction animation of the identity function using the manim library.
+
+* _successor1.py_ produces an animation of the beta reduction steps showing the successor of 0 is 1.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+###### Important Note: $\lambda$ is represented as a forward-slash string '/'.
+
 
