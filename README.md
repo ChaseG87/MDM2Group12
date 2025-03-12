@@ -19,5 +19,7 @@
 
 * _TestCases.csv_ is a list of test cases that can be applied via the **test_case()** function in **lambda_reader2.py**.
 
-* 
+* _hello.txt_ is the file called to be read by default when **lambda_reader2.py** is called.
+
+* _input.txt_ 
 
