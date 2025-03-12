@@ -307,7 +307,7 @@ def full_lambda_evaluator(string, give_steps=False):
         if give_steps:
             print(f'Step {n}:', list_to_string(new))
         n += 1
-        if n >= 1000: # stops process after 100 steps to stop 'sneaky' loops
+        if n >= 1000: # stops process after 1000 steps to stop 'sneaky' loops
             print('Max recursion depth reached')
             break
     if give_steps: # returns final result if in give_steps mode
