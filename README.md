@@ -9,7 +9,7 @@
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-#### To see the lambda_reader2.py in action simply call the program to run and it will show and example multiplication of 4 times 4.
+#### To see _lambda_reader2.py_ in action simply call the program to run and it will show and example multiplication of 4 times 4.
 
 --------------------------------------------------------------------------------------------------------------------------------
 
