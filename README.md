@@ -1,12 +1,16 @@
 # This is the working repository of MDM2's Second Term Group 12.
 
+### There are 2 branches: main and in_progress.
 
-### It contains 2 versions of the lambda calculus evaluator: lambda_reader.py and lambda_reader2.py.
+* ##### _main_ is the current version, which contains our final code.
+* ##### _in_progress_ contains in development code, in particular the _replace_with_shorthand_ function which was incomplete <see _lambda_reader2.py_ in the branch for more details>.
+
+
+### Both branches contain 2 versions of the lambda calculus evaluator: lambda_reader.py and lambda_reader2.py.
 
 * ##### _lambda_reader.py_ is an outdated version that parses through strings directly and is limited in its computational ability.
 
 * ##### _lambda_reader2.py_ is the most updated version that parses through lists of strings and functional objects.
-
 --------------------------------------------------------------------------------------------------------------------------------
 
 #### To see _lambda_reader2.py_ in action simply call the program to run and it will show an example multiplication of 4 times 4.
