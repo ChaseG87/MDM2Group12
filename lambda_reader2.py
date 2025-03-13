@@ -235,7 +235,10 @@ def remove_double_parenthesis(lst):
     Removes double parentheses in a lambda calculus expression given a list form.
     
     Input Parameters:
-    lst - The list of characters in the lambda calculus expression ##############################
+    lst - The list of characters in the lambda calculus expression##############################
+
+    Output:
+    lst - The list of characters after double parenthesis have been removed.
     '''
     
     ## Setting default values for the depth and index
@@ -270,8 +273,18 @@ def remove_double_parenthesis(lst):
 
 
 def function_flattener(lst):
-    '''Recursive flattener of lists and function objects'''
+    ''' 
+    Recursive flattener of lists and function objects 
+    Flattens by taking (/y.(/x.xx)) = /yx.xx
+
+    Input Parameters:
+    lst - Input list of lambda calculus functions ###################
+    '''
+
+    ## Sets the master list    
     master = []
+
+   ## Iterates through the characters in the list and disassembles by recursively removing the str and lists and appending to the master.    
     for l in lst:
         if isinstance(l, Function):
             master.extend(function_flattener(l.lst))
@@ -281,16 +294,30 @@ def function_flattener(lst):
             master.extend(function_flattener(l))
     return master
 
-
+###################################################################COME BACK TO FIX THIS DOCUMENTATION
 def preprocess_church(sentence):
-    ''' Takes in a function and puts it in correct form eg. /x./y.xy -> /x.(/y.xy) '''
+    ''' 
+    Takes in a function and puts it in correct form eg. /x./y.xy -> /x.(/y.xy) 
+    
+    Input Parameters:
+    sentence - The input lambda calculus expression.
+
+    Outputs:
+    sentence - The bracketed formatted version of the expression.
+    '''
+
+    ## Searches through the characters in the sentence for the '.' character.
     for idx in range(len(sentence)):
         char = sentence[idx]
         if char == '.':
+
+            #############################################
             try:
                 if sentence[idx+1] == '/':
                     paren_count = 0
                     pos = idx+1
+
+                    ###################################################
                     while paren_count >= 0 and pos <= len(sentence)-1:
                         if sentence[pos] == '(':
                             paren_count += 1
@@ -298,61 +325,110 @@ def preprocess_church(sentence):
                             paren_count -= 1
                         pos += 1
                     sentence = sentence[0:idx+1] + ['('] + sentence[idx+1:pos] + [')'] + sentence[pos:]
+
+            #####################################
             except:
                 continue
     return sentence
 
 
-def lambda_simplify(lst, body=False):  
+def lambda_simplify(lst, body=False): 
+    '''
+    Simplifies the list representing the lambda calculus expression via applications of reduction operations.
+
+    Input Parameters:
+    lst - The input list. This is the lambda calculus expression.
+
+    Output:
+    lst - The reduced version of the input representing the simplified version.
+    '''
+
+    # Prepocesses and breaks expressions into largest reducible functions
     lst = preprocess_church(lst)
     chopped = single_chop(lst) #breaks into largest reducible functions
     chopped = [function_reduce(j) if isinstance(j, list) else j for j in chopped]
-    for i in range(len(chopped)): #does all possible beta reduction operations
+
+    
+    # Completes all possible beta reduction operations
+    for i in range(len(chopped)):
         if i+1 < len(chopped):
             if isinstance(chopped[i][0], Function):
                 if len(chopped[i][0].vars) and len(chopped) > i+1:
                     chopped[i][0].beta_reduce([chopped[i+1]])
                     chopped.pop(i+1)
                     break
+                    
             if len(chopped[i]) > 1:
                 if isinstance(chopped[i][1], Function):
                     if len(chopped[i][1].vars) and len(chopped) > i+1:
                         chopped[i][1].beta_reduce([chopped[i+1]])
                         chopped.pop(i+1)
                         break
+                        
+    ## Flattens the chopped list                   
     lst = function_flattener(chopped) 
-    if len(chopped) == 1 and chopped[0][0] == '(' and chopped[0][-1] == ')' and not body: 
-        #takes away outermost parentheses if redundant
+
+    ## Removes outermost parentheses if redundant
+    if len(chopped) == 1 and chopped[0][0] == '(' and chopped[0][-1] == ')' and not body:   
         lst = lst[1:-1]
+
+    ## Returns list
     return lst
 
-
+#############################################################################COMPLETE THIS
 def depth_test(lst, lamb):
-    '''returns parenthetic depth of a given lambda index.'''
+    ''' 
+    Returns parenthetic depth of a given lambda index. 
+
+    Input Parameters:
+    lst - A list representing the lambda calculus expression
+    lamb - #############################################
+
+    Output:
+    paren_depth - An integer representing the parenthesis depth of the input list
+    '''
+
+    ## Setting the defult values for the index and depth.
     idx = 0
     paren_depth = 0
+
+    ## Iterates through and increases/decreases the depth according the brackets found.
     while idx != lamb:
         if lst[idx] == '(':
             paren_depth += 1
         if lst[idx] == ')':
             paren_depth -= 1
         idx += 1
+
+    ## Returns the output
     return paren_depth
 
-    
+####################################################################COMPLETE THIS      
 def find_next_action(lst, step):
     '''
-    Takes an input of a lambda calculus sentence in list mode, finds all options for the next reduction,
-    then picks 
+    Takes an input of a lambda calculus sentence in list mode, finds all options for the next reduction, then picks ############
+
+    Input Parameters:
+    lst - A lambda calculus sentence, represented in list mode.
+    step - 
+
+    Output:
+    lst <if ######> - 
+    options_sorted[-1][0] <if #####> - 
+    remove_double_parenthesis(lst) <if ##########> - 
     '''
-    lst = preprocess_church(lst) #normaizes form of lambda expressions
+
+    # Normalizes form of lambda expressions
+    lst = preprocess_church(lst)
     options = []
     lambda_idx = [i for i in range(len(lst)) if lst[i] == '/']
     if not lambda_idx:
         return lst
     if (lambda_idx[0] == 0 or lambda_idx[0] == 1) and lst != lambda_simplify(lst):
         options.append([lambda_simplify(lst), depth_test(lst, lambda_idx[0]), lambda_idx[0]])
-    for lamb in lambda_idx: #goes through lambdas and checks if beta reduction is possible then adds that possibility
+
+    # Goes through lambdas and checks if beta reduction is possible, then adds that possibility.
+    for lamb in lambda_idx: 
         sidx = lamb+1
         paren_count = 0
         while sidx <= len(lst):
@@ -362,6 +438,8 @@ def find_next_action(lst, step):
                     break
                 else:
                     break
+
+            ## Alters the parenthesis count [depth] according to the number of open brackets encountered.
             try:
                 if lst[sidx] =='(':
                     paren_count += 1
@@ -370,108 +448,187 @@ def find_next_action(lst, step):
             except:
                 break
             sidx += 1
-    if options and step%100 > 2: #sorts possibilites bredth first
+
+    # Sorts possibilites, breadth first.
+    if options and step%100 > 2: 
         options_sorted = sorted(options, key=lambda x:  x[1] -x[2]*0.001)
         return options_sorted[-1][0]
-    elif options and step%100 <= 2: #sort possible updates  depth first
+
+    # Sorts possible updates, depth first.
+    elif options and step%100 <= 2: 
         options_sorted = sorted(options, key=lambda x: -x[1])
-        return options_sorted[-1][0]
+        return options_sorted[-1][0]'
+        
     else:
         return remove_double_parenthesis(lst)
 
-
+########################################################COMPLETE THIS
 def full_lambda_evaluator(string, give_steps=False):
     '''
     Inputs a string of lambda calculus with '/' as lambda.
     Returns a string reduced but equivalent to the input.
+
+    Input Parameters:
+    string - 
+    give_steps <default:False> - 
+
+    Output:
+    list_to_string(loop_checker[-1]) <if ########> - 
+    list_to_string(remove_double_parenthesis(current)) <if############> - 
     '''
+
+    ## Sets the step number to 1
     n = 1
-    loop_checker = [[]] # keeps track of updates to look for repetitions
+
+    # Keeps track of updates to look for repetitions
+    loop_checker = [[]] 
     current = string_to_list(string)
+
+    ## Print initial value if in give_steps mode
     if give_steps: 
-        print('Initial:', string) # print initial value if in give_steps mode
+        print('Initial:', string) 
+
+    ## Finds next action and prints each step of the evaluator if in give_steps mode
     new = find_next_action(current, step=n)
     loop_checker.append(new)
     if give_steps:
-        print('Step 1:', list_to_string(new)) # gives each step of the evaluator if in give_steps mode
+        print('Step 1:', list_to_string(new)) 
+
+    ## Set the step number to 2
     n = 2
-    while current != new: # while loop makes sure there are no more next steps from 'find_next_action'
+
+    # While loop makes sure there are no more next steps from 'find_next_action'    
+    while current != new: 
         current = new
         new = find_next_action(current, step=n)
         loop_checker.append(new)
-        if loop_checker[-1] == loop_checker[-3]: # checks if function will 1st form loop
+
+        # Checks if function will 1st form loop
+        if loop_checker[-1] == loop_checker[-3]:
             print('Sentence loops!')
+
+            ## Provides a diagnostic if give_steps is activated
             if give_steps:
                 print('Reduced Form:', list_to_string(loop_checker[-1]))
             return list_to_string(loop_checker[-1])
+
+        ## If give steps mode is activated, then it provides a diagnostic of the simplification at each step.
         if give_steps:
             print(f'Step {n}:', list_to_string(new))
         n += 1
-        if n >= 1000: # stops process after 1000 steps to stop 'sneaky' loops
+
+        # Halts process after 1000 steps to stop 'sneaky' loops
+        if n >= 1000:
             print('Max recursion depth reached')
             break
-    if give_steps: # returns final result if in give_steps mode
+
+    # Returns final result if in give_steps mode
+    if give_steps:
                 print('Reduced Form:', list_to_string(remove_double_parenthesis(current)))
+        
     return list_to_string(remove_double_parenthesis(current))
 
 
 def main():
     '''
-    Runs the main process of lambda_reader2.py. Evaluates text in hello.txt
-    using full_lambda_evaluator in give_steps mode.
+    Runs the main process of lambda_reader2.py. 
+    Evaluates text in hello.txt using full_lambda_evaluator in give_steps mode.
     '''
     text = pull_txt()
     return full_lambda_evaluator(text, give_steps=True)
     
 
-
+## Runs main() when module is activated.
 if __name__ == "__main__":
     main() 
 
 
-def fileread(input, filename = 'definitions.csv', display = False):
+def read_definitions(input, filename = 'definitions.csv', display = False):
+    '''
+    Reads the definitions from the file and checks whether there are any abbreviations in the input present in the definitions file.
+    Allows the module to read abbreviations.
+
+    Input Parameters:
+    input - Input string to check for abbreviations.
+    filename <default: 'definitions.csv'> - The name of the definitions file. Only to be changed in exceptional circumstances.
+    display <default: False> - When True, activates a mode showing the characters and which abbreviations are present. Useful for debugging. 
+
+    Outputs:
+    input - This is the unabbreviated input.
+    '''
+
+    ## Reads the .csv file
     df = pd.read_csv(filename, header = None, names = ['Symbol', 'Expression'])
 
+    ## Display mode section
     if display:
         print(symbol)
     
-
+    ## Isolates the symbol and expression columns
     symbol = df['Symbol']
     expression = df['Expression']
 
     while True:
+        ## Sets a default that no abbreviations are detected, is turned to True during detection of abbreviations
         present = False
+
+        ## Iterates through characters in input and definitions to find a match
         for character in input:
             for idx, val in enumerate(symbol):
+
+                ## Replaces the abbreviations with the elongated expressions
                 if val == character:
                     input = input.replace(character, "("+str(expression[idx])+")")
                     present = True
 
+            ## Optional for display, shows the characters and inputs
             if display:
                 print("Character:",character)
                 print("Input:",input)
                 print("Present:", present)
 
+        ## If no abbreviations detected, return the expression
         if present == False:
             return input
 
 
 def compare_two_cases(sentence1, sentence2, display = False):
-    sentence1 = full_lambda_evaluator(fileread(sentence1))
-    sentence2 = full_lambda_evaluator(fileread(sentence2))
+    """
+    Compares two sentances and tests whether their simplifications match. Necessary for test cases.
 
+    Input parameters:
+    sentence1 - The first sentence to compare
+    sentence2 - The second sentence to compare
+    display <default: False> - When True, this activates a mode where it prints each Character to show evidence of iteration. Useful for debugging.
+
+    Output: 
+    True / False - A boolean value: True indicates a match, False indicates a mismatch.
+    """
+
+    ## Simplify the two sentences to their simplest form to speed up comparison times
+    sentence1 = full_lambda_evaluator(read_definitions(sentence1))
+    sentence2 = full_lambda_evaluator(read_definitions(sentence2))
+
+    ## Prints out the two sentences to make it easier to debug.
     print("Sentence1:", sentence1)
     print("Sentence2:", sentence2)
+
+    ## Iterates through each character in the first sentence.
     for idx, char in enumerate(sentence1):
 
+        ## If the characters match, continue.
         if sentence2[idx] == char:
             continue
+
+        ## If the characters differ, then replace the character with the one in sentence1. (This works because they have both been alpha reduced at this point.) 
         else:
             sentence2 = sentence2.replace(sentence2[idx], char)
 
+            ## If display is on, display the character. Useful for debugging.
             if display:
                 print("Char", char)
 
+    ## If the final sentances match, report a match.
     if sentence1 == sentence2:
         return True
     
@@ -480,64 +637,119 @@ def compare_two_cases(sentence1, sentence2, display = False):
         
 
 def test_case(filename = 'TestCases.csv', display = False, specific_case = None):
+    """
+    Runs the test case scenarios. Important for evaluating the success of our module.
+
+    Input Parameters:
+    filename <default: "TestCases.csv"> - The name of the file housing the Test Cases. Only to be changed in very exceptional circumstances.
+    display <default: False> - When True, it displays each individual question and answer, as well as the outcome.
+    specific_case <default: None> - When set to an integer between 0 and 26 (the indexes of the test cases), it runs only that specific case. When set to None, it runs all test cases.
+
+    Output:
+    None
+    """
+
+    ## Reads the file housing the test cases.
     df = pd.read_csv(filename, header = None, names = ['Question', 'Answer'])
-    print(df)
+
+    ## Reads the question and answer columns as seperate variables.    
     question = df['Question']
     answer = df['Answer']
 
+    ## Returns the Question and Answer variables. Only activated when display = True.
     if display:
         print("Question:", question)
         print("Answer:", answer)
-    
+
+    ## Runs all of the test cases. Only activated when specific_case = None.
     if specific_case == None:
+        ## Iterates through the test questions
         for idx, val in enumerate(question):
+
+            ## Compares one test case
             test = compare_two_cases(val, answer[idx])
-            
+
+            ## Reports the result
             if test:
                 print("Test " + str(idx) + ":", "SUCCESS")
 
             else:
                 print("Test " + str(idx) + ":", "FAIL")
 
+    ## Runs a single test case
     else:
-        test = compare_two_cases(question[specific_case], answer[specific_case])                  
+        ## Compares the case
+        test = compare_two_cases(question[specific_case], answer[specific_case])       
+
+        ## Reports the result  
         if test:
             print("Test " + str(specific_case) + ":", "SUCCESS")
 
         else:
             print("Test " + str(specific_case) + ":", "FAIL")
 
+
 def replace_with_shorthand(input, filename = 'Definitions.csv'):
+    """
+    Substitutes the variables in the output with the abbreviations to make it easier to read.
+    UNTESTED DRAFT.
+
+    Input parameters:
+    input - The sentence to replace with substitutions
+    filename <Default: "Definitions.csv"> - The filename for the definitions. Only to be changed in exceptional circumstances.
+
+    Output:
+    input - The simplified sentence.
+    """
+
+    ## Reads the file and stores expressions in a seperate variable
     df = pd.read_csv(filename, header = None, names = ['Symbol', 'Expression'])  
     expression = df['Expression']
 
     while True:
+        ## Sets the prior values for the prior and temporary versions
         prior_version = input
         temporary_version = input
 
-        for idx, char in enumerate(temporary_version):
-            if char == "(":
-                left_bracket_index = idx
-                print("Left Bracket Index:", left_bracket_index)
+## Iterates through each character and tests for brackets
+        for idx, char in enumerate(input):
+            left_found = False
+            right_found = False
 
-        for idx, char in enumerate(reversed(temporary_version)):
-            if char == ")":
-                right_bracket_index = idx
-                print("Right Bracket Index:", right_bracket_index)
-        
+            ## Gets the left_bracket_index of the first left bracket with a depth of 1 - only runs this once.
+            if char == "(" and left_found == False:
+                expression_to_test = input[:(idx + 1)]
+
+                if depth_test(expression_to_test) == 1:
+                    left_bracket_index = idx
+                    left_found = True
+
+            ## Gets the right_bracket_index of the first right bracket with a depth of 0 - only runs this once.
+            if char == ")" and right_found == False:
+                expression_to_test = str(input[:idx]) + ")"
+                if depth_test(expression_to_test) == 0:
+                    right_bracket_index = idx
+                    right_found = True
+
+        ## Unwraps the inside of the brackets using the indexes of the brackets
         try:
             temporary_version = temporary_version[:left_bracket_index] + temporary_version[(left_bracket_index + 1):right_bracket_index] + temporary_version[(right_bracket_index + 1):]
             selected_area = input[(left_bracket_index + 1) : right_bracket_index]
 
+        ## If the brackets encompass the whole expression, like (/d.dd), then select whole.
         except UnboundLocalError:
             selected_area = input
 
+        ## Loops through each possible abbreviation answer and compares to see if they simplify to the same.
+        ## If they match, it replaces it.
         for val in expression:
             if compare_two_cases(selected_area, val) == True:
                 input = input.replace(selected_area, val)
 
+        ## Saves the later version
         later_version = input
 
+        ## If the variable is unchanged, it returns the input.
         if prior_version == later_version:
             return input
 
@@ -545,7 +757,7 @@ def replace_with_shorthand(input, filename = 'Definitions.csv'):
 ########################################################
 
 
-# string_to_evaluate = fileread('/x.xFT')
+# string_to_evaluate = read_definitions('/x.xFT')
 # print(string_to_evaluate)
 # print(type(string_to_evaluate))
 # full_lambda_evaluator(string_to_evaluate, give_steps = True)
