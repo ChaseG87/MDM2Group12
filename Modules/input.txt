@@ -1,9 +1,0 @@
-/x.x
-y
-y
-/x.x 
-/y.yx
-/y.yx
-(/x.(/y.xy))
-y
-/a.ya
