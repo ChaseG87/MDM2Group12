@@ -20,13 +20,13 @@ class Function:
         self.body = lst[period_idx+1:]
         self.lst = lst
 
-        def __call__(self):
+    def __call__(self):
         """ Runs a Diagnostics - Useful for Displaying. """
 
         print("\n\n","String:", self.lst)
         print("Body:", self.body)
         print("Vars:", self.vars, "\n\n")
-        
+            
     def update(self):
         """ Regularly updates the list with the vars and body to make sure they are consistent. """
         
