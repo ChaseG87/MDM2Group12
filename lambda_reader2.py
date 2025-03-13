@@ -47,7 +47,7 @@ class Function:
 
 
         def alpha_reduction(input, vars):
-           '''
+            '''
             Changes input into form that doesnt conflict with body. Necessary for beta reduction.
 
             Input Parameters:
@@ -457,7 +457,7 @@ def find_next_action(lst, step):
     # Sorts possible updates, depth first.
     elif options and step%100 <= 2: 
         options_sorted = sorted(options, key=lambda x: -x[1])
-        return options_sorted[-1][0]'
+        return options_sorted[-1][0]
         
     else:
         return remove_double_parenthesis(lst)
