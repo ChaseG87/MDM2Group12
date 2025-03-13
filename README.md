@@ -1,9 +1,9 @@
 # This is the working repository of MDM2's Second Term Group 12.
 
-### There are 2 branches: main and in_progress.
+### There are 2 branches: main and code_in_progress.
 
 * ##### _main_ is the current version, which contains our final code.
-* ##### _in_progress_ contains in development code, in particular the _replace_with_shorthand_ function which was incomplete <see _lambda_reader2.py_ in the branch for more details>.
+* ##### _code_in_progress_ contains in development code, in particular the _replace_with_shorthand_ function which was incomplete <see _lambda_reader2.py_ in the branch for more details>.
 
 
 ### Both branches contain 2 versions of the lambda calculus evaluator: lambda_reader.py and lambda_reader2.py.
