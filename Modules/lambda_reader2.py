@@ -94,7 +94,7 @@ class Function:
             self.vars = self.vars[1:]
             innie = alpha_reduction(innie, var_list)
 
-        ## Substitutes the inside of the equations back into the bodies ##############################
+        ## Substitutes each instance of the input variable for the input
             for _ in range(self.body.count(var)):
                 insert_idx = self.body.index(var)
                 self.body = self.body[0:insert_idx] + innie + self.body[insert_idx+1:]
@@ -229,13 +229,13 @@ def single_chop(lst):
                 current.append(i)
     return stack
 
-#####################################################COMPLETE THIS
+
 def remove_double_parenthesis(lst):
     '''
     Removes double parentheses in a lambda calculus expression given a list form.
     
     Input Parameters:
-    lst - The list of characters in the lambda calculus expression##############################
+    lst - The list of characters in the lambda calculus expression.
 
     Output:
     lst - The list of characters after double parenthesis have been removed.
@@ -278,7 +278,7 @@ def function_flattener(lst):
     Flattens by taking (/y.(/x.xx)) = /yx.xx
 
     Input Parameters:
-    lst - Input list of lambda calculus functions ###################
+    lst - Input list of lambda calculus expression with functions
     '''
 
     ## Sets the master list    
@@ -294,7 +294,7 @@ def function_flattener(lst):
             master.extend(function_flattener(l))
     return master
 
-###################################################################COME BACK TO FIX THIS DOCUMENTATION
+
 def preprocess_church(sentence):
     ''' 
     Takes in a function and puts it in correct form eg. /x./y.xy -> /x.(/y.xy) 
@@ -310,14 +310,12 @@ def preprocess_church(sentence):
     for idx in range(len(sentence)):
         char = sentence[idx]
         if char == '.':
-
-            #############################################
+        ## If next element after a '.' is a '/' wraps the underlying lambda expression in parentheses.
             try:
                 if sentence[idx+1] == '/':
                     paren_count = 0
                     pos = idx+1
 
-                    ###################################################
                     while paren_count >= 0 and pos <= len(sentence)-1:
                         if sentence[pos] == '(':
                             paren_count += 1
@@ -326,7 +324,6 @@ def preprocess_church(sentence):
                         pos += 1
                     sentence = sentence[0:idx+1] + ['('] + sentence[idx+1:pos] + [')'] + sentence[pos:]
 
-            #####################################
             except:
                 continue
     return sentence
@@ -375,14 +372,14 @@ def lambda_simplify(lst, body=False):
     ## Returns list
     return lst
 
-#############################################################################COMPLETE THIS
+
 def depth_test(lst, lamb):
     ''' 
     Returns parenthetic depth of a given lambda index. 
 
     Input Parameters:
     lst - A list representing the lambda calculus expression
-    lamb - #############################################
+    lamb - The index of the lambda being tested
 
     Output:
     paren_depth - An integer representing the parenthesis depth of the input list
@@ -403,19 +400,18 @@ def depth_test(lst, lamb):
     ## Returns the output
     return paren_depth
 
-####################################################################COMPLETE THIS      
+   
 def find_next_action(lst, step):
     '''
     Takes an input of a lambda calculus sentence in list mode, finds all options for the next reduction, then picks ############
 
     Input Parameters:
     lst - A lambda calculus sentence, represented in list mode.
-    step - 
+    step - step in the full_lambda_evaluator.
 
     Output:
-    lst <if ######> - 
-    options_sorted[-1][0] <if #####> - 
-    remove_double_parenthesis(lst) <if ##########> - 
+    options_sorted[-1][0] if a beta reduction can simplify the expression - 
+    remove_double_parenthesis(lst) if there is no beta reduction to be made - 
     '''
 
     # Normalizes form of lambda expressions
@@ -462,19 +458,19 @@ def find_next_action(lst, step):
     else:
         return remove_double_parenthesis(lst)
 
-########################################################COMPLETE THIS
+
 def full_lambda_evaluator(string, give_steps=False):
     '''
     Inputs a string of lambda calculus with '/' as lambda.
     Returns a string reduced but equivalent to the input.
 
     Input Parameters:
-    string - 
+    string - lambda calculus expression as a string.
     give_steps <default:False> - 
 
     Output:
-    list_to_string(loop_checker[-1]) <if ########> - 
-    list_to_string(remove_double_parenthesis(current)) <if############> - 
+    list_to_string(loop_checker[-1]) if the expression loops - 
+    list_to_string(remove_double_parenthesis(current)) if the final result is reached or reaches 1000 steps - 
     '''
 
     ## Sets the step number to 1
